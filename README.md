@@ -9,12 +9,18 @@ It all starts with a note. |o|.
 
 A1 A2 A3 A4 A5 A6 A7 A8 
 - which stands for A '1', and A '2', '3', '4', ... on the piano 
+
 B1 B2 B3 B4 B5 B6 B7 B8 
 - which stands for B '1', and B '2', '3', '4', ... on the piano 
-C1 C2 C3 C4 C5 C6 C7 C8
+
+C1 C2 C3 C4 C5 C6 C7 C8 
+... 
 ...
-As4 As5 As6 As7 As8 - which stands for "A sharp 4" "A sharp 5" ...  
-Bf4 Bf5 Bf6 Bf7 Bf8 - which stands for "B flat 4" "B flat 5" ... 
+As4 As5 As6 As7 As8 
+- which stands for "A sharp 4" "A sharp 5" ...  
+
+Bf4 Bf5 Bf6 Bf7 Bf8 
+- which stands for "B flat 4" "B flat 5" ... 
 (A sharp 4 and B flat 4 are equivalent notes on the piano) 
 
 Cs4 Cs5 Cs6 Cs7 Cs8 - which stand for "C sharp 4" and so on
