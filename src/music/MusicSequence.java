@@ -39,82 +39,18 @@ import music.objects.MusicalObjects.Rest;
 public class MusicSequence extends ArrayList<MusicalPair<TimerTask, TimerTask>>{
 	
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	public long beatTimeMs;
 	int lastChannelNum;
 	
 	// copy constructor
-	public MusicSequence(MusicSequence older)
-	{
-		this(older.beatTimeMs, older);
-	}
+	public MusicSequence(MusicSequence older) { this(new ArrayList<>(older)); }
 	
-	public MusicSequence(long beatTimeMs)
-	{
-		this(beatTimeMs, new ArrayList<>());
-	}
+	public MusicSequence() { this(new ArrayList<>()); }
 	
-	public MusicSequence(long beatTimeMs, Collection<MusicalPair<TimerTask, TimerTask>> allBeats)
-	{
+	public MusicSequence(Collection<MusicalPair<TimerTask, TimerTask>> allBeats) { 
 		super(allBeats);
-		this.beatTimeMs = beatTimeMs;
 		lastChannelNum = -1;
 	}
-//	public MusicSequence(long beatTimeMs, Collection<TimingPair> allBeats)
-//	{
-//		super(allBeats);
-//		this.beatTimeMs = beatTimeMs;
-//		nextChannel = 0;
-//	}
-	
-//	public static List<TimingPair> generateTonesMidi(Beat[] notes, int volume, boolean addHarmonic, String midiInstrument) throws MidiUnavailableException
-//	{
-//		Synthesizer synth = MidiSystem.getSynthesizer();
-//	    synth.open();
-//	    MidiChannel[] channels = synth.getChannels();
-//	    MidiChannel pianoChannel = channels[0];
-//	    List<TimingPair> tp = new ArrayList<TimingPair>();
-//		for(int i = 0; i < notes.length; i++) {
-//			Beat nextB = notes[i];
-//			TimingPair t = new TimingPair(nextB, pianoChannel, volume);
-//			tp.add(t);
-//		}
-//		return tp;
-//	}
-	
-	public static int findInstrument(Synthesizer synth, String instrumentName) {
-		Instrument[] allInstruments = synth.getLoadedInstruments();
-		for(int i = 0; i < allInstruments.length; i++) {
-        	String eName = allInstruments[i].getName();
-        	boolean matches = eName.toLowerCase().contains(instrumentName.toLowerCase());
-        	if(matches)
-        		return i;
-        }
-		return -1;
-	}
-	/**
-	 * Return true if the new channel was successfully added
-	 * @return
-	 */
-	public static Patch selectNext2(Instrument[] allInstruments, Beat nextB, Patch defaultPatch) {
-		String bPatch = nextB.playsWith.patch.toLowerCase();
-		int bSelection = nextB.playsWith.selection;
-		if(bSelection == MusicalObjects.Instrument.SELECTION_UNCONFIRMED)
-			bSelection = 1;
-		int count = 0;
-		
-		for(javax.sound.midi.Instrument e : allInstruments) 
-			
-			if(e.getName().toLowerCase().contains(bPatch)) {
-				count++;
-        		if(count == bSelection)  
-        			return e.getPatch();
-        	}
-		return defaultPatch;
-	}	
 	
 	public static Patch selectNext(Instrument[] allInstruments, Beat nextB, Patch defaultPatch) {
 		String bPatch = nextB.playsWith.patch.toLowerCase();
