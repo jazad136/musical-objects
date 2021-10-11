@@ -33,26 +33,37 @@ import music.objects.MusicalObjects.Meter;
 import music.objects.MusicalObjects.Pitch;
 
 public class NoteSynchronizer {
-	//TODO: Add Java 8 JRE to workspace. 
+	/** List of MusicSequence objects containing MusicalObjects score sheet 
+	 * elements that will be added to the music player threads */
 	private ArrayList<MusicSequence> basis;
 	public static Count defaultCount = Count.QTR;
 	
+	/** The default volume instruments in MusicalObjects are played at */
 	public static final int defaultVolume = 100;
+	/** The delay to wait, in milliseconds, to start music */
 	public static final int delayToStartMusic = 3000;
-	public static final int defaultMeterDuration = 600;
+	/** The default number of meter beats in a measure */
 	public static final int defaultBeatsPerMeasure = 4;
+	/** The default instrument patch to play songs in */
 	public static final String defaultInstrumentPatch = "piano";
+	/** The deafult key that intervals are played in */
 	public static final Pitch defaultKey = Pitch.C4;
+	/** The default MusicalObjects instrument object used to play songs */
 	public static final Instrument defaultInstrument = new Instrument("piano");
-	
-	public static final Meter defaultMeter = new Meter(defaultBeatsPerMeasure, defaultCount);
 	static {
 		defaultInstrument.volume = defaultVolume;
-		defaultInstrument.patch = defaultInstrumentPatch;
 	}
+	/** The default meter object used to define timing */
+	public static final Meter defaultMeter = new Meter(defaultBeatsPerMeasure, defaultCount);
+	/** the semaphores used to signal the end of the song, and that help to end the program */
 	public final Semaphore scheduleWait, doneWait;
+	/** The schedule of times registered when adding songs to the track threads */
 	public long[][][] schedule;
 	
+	/** Constructor for the NoteSynchronizer class. 
+	 *  Sets up the semaphores to be used to keep track of completion of various end
+	 *  tasks for music player, as well as the list to hold new music sequences
+	 *  containing musical objects score sheet elements to be played */
 	public NoteSynchronizer()
 	{
 		scheduleWait = new Semaphore(0, true);
@@ -62,8 +73,17 @@ public class NoteSynchronizer {
 	
 	public NoteSynchronizer(Count getsTheBeat) { this(); }
 	
-	
+	/** Adds a new list of music sequence objects to this note synchronizer to be played later
+	 * via a call to startMusic()
+	 */
 	public void addMusicSequence(MusicSequence mseq) { basis.add(mseq); }
+	
+	/** 
+	 * Starts playing musical objects score sheet music. 
+	 * Creates a copy of the basis containing the sequences that contain content,
+	 * then using this copy, schedule as many threads as needed to play all tracks
+	 * using the schedule() method. 
+	 */
 	public void startMusic()
 	{
 		// create a copy of the basis containing useful sequences to play.
@@ -73,9 +93,6 @@ public class NoteSynchronizer {
 		while(sIt.hasNext())
 			if(sIt.next().isEmpty())
 				sIt.remove();
-		
-//		Calendar nowCal = Calendar.getInstance();
-//		long now = nowCal.getTimeInMillis();
 		
 		// schedule the music to play via little threads that each do their part.
 		long startTime = delayToStartMusic;
@@ -111,6 +128,12 @@ public class NoteSynchronizer {
 		
 	}
 	
+	/**
+	 * Determine via exhaustive calculation which index of sequences is "longest", 
+	 * or contains counted beats adding up to the longest duration.
+	 * 
+	 * Returns the index of the sequence with the longest duration. 
+	 */
 	public int isLongestOf(List<MusicSequence> sequences)
 	{
 		long finalTime = Long.MIN_VALUE;
@@ -128,21 +151,32 @@ public class NoteSynchronizer {
 		}
 		return longestSong;
 	}
-	public boolean checkDone(boolean[] finishArray)
-	{
+	
+	/**
+	 * Return true if the process of scheduling for all music sequences in the basis is complete. 
+	 * Return false if for one of the music sequences, the schedule method has not completed. 
+	 */
+	public boolean checkDone(boolean[] finishArray) {
 		for(boolean done : finishArray) 
 			if(!done)
 				return false;
 		return true;
 	}
-	public boolean schedule(MusicSequence times, long startTime, int timerNo, long[][] schedule, boolean isLongest)
-	{
+	/** 
+	 * Attempt to create as many timer tasks as necessary to simulate the track of beats provided
+	 * in music sequence "times", noting the intended start of the sequence as "startTime",
+	 * the number of the sequences "timerNo", and the journal of all times logged by the 
+	 * synchronizer "schedule". Each time an event is to be played, a sequence of execution times
+	 * for start and stop is logged into the schedule for bookkeeping purposes and for re-use in future versions
+	 * of this project. 
+	 */
+	public boolean schedule(MusicSequence times, long startTime, int timerNo, long[][] schedule, boolean isLongest) {
 		if(times.isEmpty())
 			throw new RuntimeException("No notes provided to scheduler.");
 		Timer musicalDing = new Timer("MusicalObjectsSongRunner" + timerNo);
 		long nowDelay = startTime;
 		// let there be a slight delay between every note off signal, and note on signal.
-		long slightDelay = (int)Math.ceil(MusicalObjects.durationOf(Count.TRIPLET_HTETH, Count.QTR, times.beatTimeMs));
+		long slightDelay = (int)Math.ceil(MusicalObjects.durationOf(Count.TRIPLET_HTETH, Count.QTR, Count.QTR.timeUnits));
 		
 		MusicalPair<TimerTask, TimerTask> timeNow = times.get(0);
 		musicalDing.schedule(timeNow.first, startTime);
@@ -151,8 +185,6 @@ public class NoteSynchronizer {
 		for(int i = 1; i < times.size(); i++) {
 			
 			next = times.get(i);
-//			long slightDelay = (int)Math.ceil(MusicalObjects.durationOf(Count.TRIPLET_HTETH, Count.QTR, next.beat.count.timeUnits));
-//			nextDuration = (long)Math.rint(MusicalObjects.durationOf(timeNow.beat, Count.QTR, next.baseBeatDurationMs));
 			nextDuration = (long)Math.rint(MusicalObjects.durationOf(timeNow.beat, Count.QTR, timeNow.baseBeatDurationMs));
 			// figure out where the next delay point is
 			schedule[i-1][0] = nowDelay;
@@ -163,9 +195,7 @@ public class NoteSynchronizer {
 			timeNow = next;
 			musicalDing.schedule(timeNow.first, nowDelay);
 			
-//			timeNow.time = nowDelay - (int)MusicalObjects.durationOf(timeNow.beat, times.getsTheBeat, times.beatTimeMs);
-			timeNow.setTime(nowDelay - (int)MusicalObjects.durationOf(timeNow.beat, Count.QTR, times.beatTimeMs));
-//			timeNow.setTime(nowDelay - (int)MusicalObjects.durationOf(timeNow.beat, Count.QTR, timeNow.baseBeatDurationMs));
+			timeNow.setTime(nowDelay - (int)MusicalObjects.durationOf(timeNow.beat, Count.QTR, Count.QTR.timeUnits));
 		}
 		
 		if(nextDuration > 0)
@@ -174,7 +204,6 @@ public class NoteSynchronizer {
 			musicalDing.schedule(new TimerTask(){
 				public void run() { 
 					doneWait.release(9); 
-//					doneWait.release(); 
 					musicalDing.cancel();}}, 
 			nowDelay + 1000);
 		}
