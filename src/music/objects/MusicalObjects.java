@@ -18,13 +18,6 @@
 
 package music.objects;
 
-
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-
 /**
  * Source code for the MusicalObjects Class
  * This class is responsible for holding enumerations of various objects
@@ -178,153 +171,22 @@ public class MusicalObjects {
 			this.accidentalAliases = downAccidentalAliases.split("/");
 			this.quality = q;
 			this.halfSteps = i;
-		} 
-		
-		
-		// the idea: support mid range from [0 to 12]
-		// support low range from [1l to 11l then 0]
-		// support high range from [+0h to +11h then 0hh] 
-		
-		public Interval transpose(int newHalfSteps) {
-			if(this == UNKI 
-			|| halfSteps + newHalfSteps > 12
-			|| ordinal() + newHalfSteps < -12) {
-				return UNKI;
-			}
-			
-			switch(halfSteps + newHalfSteps) {
-			case -1: 
-			case -2:
-			case -3:
-			case -4:
-			case -5:
-			case -6:
-			case -7:
-			case -8:
-			case -9:
-			case -10:
-			case -11:
-			case -12:
-			case 0: return P1;
-			case 1: return MI2;
-			case 2: return M2;
-			case 3: return MI3;
-			case 4: return M3;
-			case 5: return P4;
-			case 6: return DIM5;
-			case 7: return P5;
-			case 8: return MI6;
-			case 9: return M6;
-			case 10: return MI7;
-			default: return UNKI;
-			}
 		}
 	}
-	public static enum IntervalOld {
-		// thanks goes out to https://musictheoryblog.blogspot.com/2007/01/intervals.html
-		// for a list of intervals
-		//thanks goes out to the Yamaha DGX-230/YPG-235 Owner's Manual, (pp. 69) for information
-		// on different chords
-		// make the variables as small as possible.
-		Z(0, KeyQuality.MAJOR)
-		,H (1, KeyQuality.MAJOR)
-		,W  (2, KeyQuality.MAJOR)
-		
-		,P1(0, KeyQuality.MAJOR     ,"1")         ,D2(0, KeyQuality.DIMINISHED,"1")
-		,A1(1, KeyQuality.AUGMENTED ,"1s" , "2f") ,Mi2(1,KeyQuality.MINOR     ,"1s" , "2f") 
-		,M2 (2, KeyQuality.MAJOR    ,"2")         ,D3(2, KeyQuality.DIMINISHED,"2")
-		,A2(3, KeyQuality.AUGMENTED ,"2s" , "3f") ,Mi3(3,KeyQuality.MINOR     ,"2s" , "3f") 
-		,M3 (4, KeyQuality.MAJOR    ,"3" , "4f")  ,D4(4, KeyQuality.DIMINISHED,"3"  , "4f")
-		,A3(5, KeyQuality.AUGMENTED ,"4"  , "3s" ),P4 (5, KeyQuality.MAJOR    ,"4" , "3s")  
-		,A4 (6, KeyQuality.AUGMENTED, "4s", "5f") ,D5(6, KeyQuality.DIMINISHED,"4s" , "5f")
-		,P5 (7, KeyQuality.MAJOR,    "5") 		  ,D6(7, KeyQuality.DIMINISHED,"5")
-		,Mi6(8,KeyQuality.MINOR,     "5s" , "6f") ,A5(8, KeyQuality.AUGMENTED, "5s" , "6f")
-		,M6 (9, KeyQuality.MAJOR,    "6")         ,D7(9, KeyQuality.DIMINISHED,"6")
-		,Mi7(10,KeyQuality.MINOR,    "6s" , "7f") ,A6(10, KeyQuality.AUGMENTED,"6s" , "7f")
-		,M7 (11, KeyQuality.MAJOR,   "7"  , "8f") ,D8(11, KeyQuality.DIMINISHED,"7", "8f")
-		,P1h (12, KeyQuality.MAJOR,  "8")    	  ,A7(12, KeyQuality.AUGMENTED, "8")
-		,A1h (13, KeyQuality.MAJOR,  "8s" , "9f") ,Mi2h(13, KeyQuality.AUGMENTED, "8s","9f")
-		,M2h(14,KeyQuality.MAJOR,    "9")        ,D3h(14, KeyQuality.DIMINISHED ,"9")
-		,A2h(15,KeyQuality.AUGMENTED,"10")       ,Mi3h(15, KeyQuality.MINOR,"10")
-//		,Mi10(15,KeyQuality.MINOR     ,"2s" , "3f") ,A9(3, KeyQuality.AUGMENTED ,"2s" , "3f")
-//		,M10 (16, KeyQuality.MAJOR    ,"3" , "4f")  ,D11(4, KeyQuality.DIMINISHED,"3"  , "4f")
-//		,P11 (17, KeyQuality.MAJOR    ,"4" , "3s")  ,A10(5, KeyQuality.AUGMENTED ,"4"  , "3s" )
-//		,A11 (18, KeyQuality.AUGMENTED, "4s", "5f") ,D12(6, KeyQuality.DIMINISHED,"4s" , "5f")
-//		,P12 (19, KeyQuality.MAJOR,    "5") 		,D13(7, KeyQuality.DIMINISHED,"5")
-//		,Mi13(20,KeyQuality.MINOR,     "5s" , "6f") ,A12(8, KeyQuality.AUGMENTED, "5s" , "6f")
-//		,M13 (21, KeyQuality.MAJOR,    "6")         ,D14(9, KeyQuality.DIMINISHED,"6")
-//		,Mi14(22,KeyQuality.MINOR,    "6s" , "7f")  ,A13(10, KeyQuality.AUGMENTED,"6s" , "7f")
-//		,M14 (23, KeyQuality.MAJOR,   "7",   "8f")  ,D15(11, KeyQuality.DIMINISHED,"7", "8f")
-//		,P15 (24, KeyQuality.MAJOR,   "1h/8")       ,A15(12, KeyQuality.AUGMENTED, "1h/8")
-		,UNKI(0, KeyQuality.UNKQ) 
-		;
-		
-		final int halfSteps;
-		public KeyQuality quality;
-		public final String[] nicknameAliases;
-		public final String[] accidentalAliases;
-		
-		private IntervalOld(int jump, KeyQuality q) {
-			this.nicknameAliases = new String[0];
-			this.accidentalAliases = new String[0];
-			this.quality = q;
-			this.halfSteps = jump;
-		}
-		private IntervalOld(int i, KeyQuality q, String nicknameAliases) {
-			this.nicknameAliases = nicknameAliases.split("/");
-			this.accidentalAliases = new String[0];
-			this.quality = q;
-			this.halfSteps = i;
-		}
-		private IntervalOld(int i, KeyQuality q, String nicknameAliases, String downAccidentalAliases) {
-			this.nicknameAliases = nicknameAliases.split("/");
-			this.accidentalAliases = downAccidentalAliases.split("/");
-			this.quality = q;
-			this.halfSteps = i;
-		} 
-		
-		
-		// the idea: support mid range from [0 to 12]
-		// support low range from [1l to 11l then 0]
-		// support high range from [+0h to +11h then 0hh] 
-		
-//		public Interval transpose(int newHalfSteps) {
-//			if(this == UNKI 
-//			|| halfSteps + newHalfSteps > 12
-//			|| ordinal() + newHalfSteps < -12) {
-//				return UNKI;
-//			}
-//			
-//			switch(halfSteps + newHalfSteps) {
-//			case -1: 
-//			case -2:
-//			case -3:
-//			case -4:
-//			case -5:
-//			case -6:
-//			case -7:
-//			case -8:
-//			case -9:
-//			case -10:
-//			case -11:
-//			case -12:
-//				case 0: return P1;
-//				case 1: return Mi2;
-//				case 2: return M2;
-//				case 3: return Mi3;
-//				case 4: return M3;
-//				case 5: return P4;
-//				case 6: return D5;
-//				case 7: return P5;
-//				case 8: return Mi6;
-//				case 9: return M6;
-//				case 10: return Mi7;
-//				default: return UNKI;
-//			}
-//		}
-	}
+
+	/** 
+	 * A pitch stores information about the exact midi number that some 
+	 * pitch on a MusicalObjects score sheet expresses, as well as
+	 * the frequency value of the note being expressed. If necessary, 
+	 * accidental aliases are also provided to help express opposing accidentals
+	 * that mean the same thing. <br>
+	 * <br>
+	 * Accidental pitches are identified by their "sharp"
+	 * alternatives, but accidental alternatives of pitches that contain "flats" 
+	 * are also recognized in MusicalObjects score sheets each pitch. 
+	 */
 	public static enum Pitch {
-		A0(27.5,    21),		As0(29.1352, 22, "Bf0")
+		 A0(27.5,    21),		As0(29.1352, 22, "Bf0")
 		,B0(30.8677, 23)
 		,C1(32.7032, 24),		Cs1(34.6478, 25, "Df1")
 		,D1(36.7081, 26),		Ds1(38.8909, 27, "Ef1")
@@ -385,10 +247,17 @@ public class MusicalObjects {
 		,UNK(0, 0);
 		;
 	
+		/** The the frequency that identifies the sound of the note when played aloud */
 		public final double noteValue;
+		/** The number of this note as specified in MIDI standards*/
 		public final int midiNumber;
+		/** For accidentals, the string or set of strings that help identify this note
+		 * using the literal one half step higher */
 		public final String[] downAccidentalAliases;
 		public final String nicknameAlias;
+		/** Constructor for the pitch, that sets the noteValue, the midi note number, 
+		 *  any aliases (for accidental notes), and nickname aliases for the note itself. 
+		 */
 		private Pitch(double noteValue, int midiNoteNumber, String downAccidentalAliases, String nicknameAliases)
 		{
 			this.noteValue = noteValue; 
@@ -396,6 +265,9 @@ public class MusicalObjects {
 			this.downAccidentalAliases = downAccidentalAliases.split("/");
 			this.nicknameAlias = nicknameAliases;
 		}
+		/** Constructor for the pitch, that sets the noteValue, the midi note Number, 
+		 *  any aliases (for accidental notes). 
+		 */
 		private Pitch(double noteValue, int midiNoteNumber, String downAccidentalAliases)
 		{
 			this.noteValue = noteValue; 
@@ -403,6 +275,8 @@ public class MusicalObjects {
 			this.downAccidentalAliases = downAccidentalAliases.split("/");
 			this.nicknameAlias = "";
 		}
+		/** Constructor for the pitch, that sets the noteValue and the midi note number
+		 */
 		private Pitch(double noteValue, int midiNoteNumber)
 		{
 			this.noteValue = noteValue; 
@@ -410,10 +284,20 @@ public class MusicalObjects {
 			this.downAccidentalAliases = new String[0];
 			this.nicknameAlias = "";
 		}
-		public String toString()
-		{
+		/**
+		 * Returns a String representation of this note. If it has a nickname it is printed.
+		 * Otherwise, its enumerated constant is printed instead. 
+		 */
+		public String toString() {
 			return nicknameAlias.isEmpty() ? name() : nicknameAlias;
 		}
+		
+		/**
+		 * Transposes this pitch to a new pitch. Pitches are organized in this enumeration
+		 * by half steps. The integer parameter half steps is used to find the necessary
+		 * pitch out of the ones supported in Musical Objects score sheets. If too extreme
+		 * a value is provided, Pitch.UNK is returned. 
+		 */
 		public Pitch transpose(int halfSteps) {
 			if(ordinal() + halfSteps > Pitch.values().length 
 			|| ordinal() + halfSteps < 0)
@@ -422,6 +306,13 @@ public class MusicalObjects {
 		}
 	}
 	
+	/** 
+	 * A sound stores information about the midi number some 
+	 * sound token on a MusicalObjects score sheet will express within the drum kit
+	 * NoteSynchronizer will choose to use to play drum sounds.  
+	 * 
+	 * The frequency that all sounds are played on is the C4 frequency on the keyboard. 
+	 */
 	public static enum Sound
 	{
 		TUM(35),
@@ -445,38 +336,57 @@ public class MusicalObjects {
 		
 		
 		public final int midiNumber;
+		
+		/** Constructor that gives a negative one value to the midi number setting. */
 		private Sound()
 		{
 			this.midiNumber = -1;
 		}
+		/** Constructor that sets the midi number argument to the integer specified. */
 		private Sound(int midiNumber)
 		{
 			this.midiNumber = midiNumber;
 		}
 	}
-	
+	/**
+	 * Empty interface for the staff component, that is extended by all tokens on a 
+	 * Musical Objects score sheet. 
+	 */
 	public abstract interface StaffComponent
 	{
 		
 	}
 	
+	/** 
+	 * Class representing the object helping to store data about the volume token. 
+	 */
 	public static class Volume implements StaffComponent
 	{
 		public int volume;
-		public Volume(int setting)
-		{
+		public Volume(int setting) {
 			this.volume = setting;
 		}
 	}
+	/** 
+	 * A Musical Objects instrument stores information about instrument tokens
+	 * provided via musical objects score sheets, helping to dictate whether they were or 
+	 * were not found on the system.  
+	 */
 	public static class Instrument implements StaffComponent
 	{
+		/** The main pitch that this instrument will be used to play if one is specified */
 		public Pitch homePitch;
+		/** The system name of the instrument specified that will be used to play instances of sound */
 		public String patch;
+		/** If there are multiple MIDI Instrument objects with the same name, the selection of
+		 * which one to play. Otherwise, this is set to -1 for unconfirmed*/
 		public int selection;
+		/** The volume at which to play this instrument. If no volume is specified, has a setting of -1 for unconfirmed */
 		public int volume; 
+		/** A constant representing that a selection has not been confirmed */
 		public static final int SELECTION_UNCONFIRMED = -1;
 		
-		
+		/** Constructor for an instrument object, specifying only the patch to be played. */
 		public Instrument(String patch)
 		{
 			this.patch = patch;
@@ -485,35 +395,56 @@ public class MusicalObjects {
 			this.homePitch = Pitch.UNK;
 		}
 		
+		/** 
+		 * Constructor for an instrument object, specifying the patch and numerical 
+		 * selection for similarly named patches. 
+		 */
 		public Instrument(String patch, int selection)
 		{
 			this(patch);
 			this.selection = selection;
 		}
 		
+		/**
+		 * Contsructor for an instrument object, specifying the patch and 
+		 * base pitch to be played using this instrument (reserved for use
+		 * to play strikes).
+		 */
 		public Instrument(String patch, Pitch basePitch)
 		{
 			this(patch);
 			this.homePitch = basePitch;
 		}
 		
+		/**
+		 * Constructor for an instrument object, specifying the patch, 
+		 * the patch selection, and the
+		 * base pitch to be played using this instrument
+		 */
 		public Instrument(String patch, int selection, Pitch basePitch)
 		{
 			this(patch, selection);
 			this.homePitch = basePitch;
 		}
 		
-		// set the volume. 
+		/** Constructor for an instrument object that sets the patch, the
+		 * base pitch and the volume that the instrument is to be played at.*/ 
 		public Instrument(String patch, Pitch basePitch, int volumeSetting)
 		{
 			this(patch, basePitch);
 			this.volume = volumeSetting;
 		}
+		/** Constructor for an instrument object, specifying the patch, patch selection
+		 * for similarly named patches, the homePitch to play the instrument, and the 
+		 * volume setting to play the instrument at. 
+		 */
 		public Instrument(String patch, int selection, Pitch basePitch, int volumeSetting)
 		{
 			this(patch, selection, basePitch);
 			this.volume = volumeSetting;
 		}
+		/** Returns this instrument object as a string, Consisting of the String \"Instrument\"
+		 * followed by the patch, and if set, the patch selection, volume, and home pitch.*/
 		public String toString()
 		{
 			return "Instrument " + patch + (selection != SELECTION_UNCONFIRMED ? " "+selection : " ") 
@@ -521,38 +452,47 @@ public class MusicalObjects {
 					+ ((homePitch != Pitch.UNK) ? "(home pitch " + homePitch + ")" : "");
 		}
 		
+		/**
+		 * Returns a copy of this instrument object, with all instance variables 
+		 * carried over from this object. 
+		 */
 		public Instrument copy()
 		{
 			Instrument toReturn = new Instrument(patch);
 			toReturn.homePitch = homePitch;
 			toReturn.volume = volume;
 			toReturn.patch = patch;
-			toReturn.selection = SELECTION_UNCONFIRMED;
+			toReturn.selection = selection;
 			return toReturn;
 		}
 	}
-	public static class Repeat implements StaffComponent
-	{
-		public Repeat(Measure repeatMeasure, int currentMeasure)
-		{
-			
-		}
-	}
+	
+	/** 
+	 * Reserved class representing the measure marker component of a musical objects
+	 * score sheet. This class will be used to carry information about 
+	 * measure tokens. 
+	 */
 	public static class MeasureMarker implements StaffComponent
 	{
 		
 	}
-	
-	public static class Key implements StaffComponent
-	{
-		public Pitch pitch;	
-	}
+	/**
+	 * A meter is an object storing information about the time signature of a 
+	 * staff line, as well as how long notes in a staff without a count durate. 
+	 * beatsMerPeasure will be used in future iterations of MusicalObjects.
+	 */
 	public static class Meter implements StaffComponent
 	{
+		/** An integer describing how many beats should exist between measure markers in this meter */
 		public int beatsPerMeasure;
+		/** A count object describing the count object representing the default beat of the meter */
 		public Count getsTheBeat;
+		/** A long integer denoting the number of milliseconds each getsTheBeat beat should last. */
 		public long getsTheBeatDurationMs;
+		/** A constant representing that a duration is undefined */
 		public static final long DURATION_UNDEFINED = -1;
+		/** Constructor for the Meter class, which sets the beats per measure and the 
+		 *  count that gets the beat. */
 		public Meter(int beatsPerMeasure, Count getsTheBeat)
 		{
 			this.beatsPerMeasure = beatsPerMeasure;
@@ -560,6 +500,9 @@ public class MusicalObjects {
 			this.getsTheBeatDurationMs = DURATION_UNDEFINED;
 		}
 		
+		/** Constructor for the meter class. Sets the beats per measure and the 
+		 *  count that gets the beat, as well as that beat's intended millisecond duration.
+		 */
 		public Meter(int beatsPerMeasure, Count getsTheBeat, long getsTheBeatDurationMs)
 		{
 			this.beatsPerMeasure = beatsPerMeasure;
@@ -567,24 +510,51 @@ public class MusicalObjects {
 			this.getsTheBeatDurationMs = getsTheBeatDurationMs;
 		}
 	}
+	/**
+	 * A Beat stores information about a musical event. In musical objects, a pitch sound that 
+	 * results from playing an instrument, a duration of not making sound taken in the middle 
+	 * of pieces, and a strike on the drum kit, are all represented by the information 
+	 * recorded in the beat object. 
+	 *
+	 * An instance of beat must return a string representation of its type. 
+	 * It must also return some representation of<br>
+	 * a pitch value at which to play the sound,<br> 
+	 * a count value representing the duration of the beat<br>
+	 * some representation of the midi number used to play the sound,<br> 
+	 * and a number representing the volume at which the sound is to be played. <br>
+	 * 
+	 * Other variables in the beat object also exist to help encode other valuable information.
+	 */
 	public abstract static class Beat implements StaffComponent
 	{
+		/** A long representing how fast this beat should be played in milliseconds */
 		public long playSpeedMs;
+		/** The count assigned to this beat*/
 		public Count count;
+		/** The value of the pitch assigned to this beat */
 		public double pitchVal;
+		/** The midiNumber of the pitch to be played */
 		public int midiNumber;
+		/** Helps determine whether this beat falls underneath special criteria */
 		public boolean isSpecialSound;
+		/** The volume this beat should be played at*/
 		public int volume;
+		/** The instrument used to play this beat */
 		public Instrument playsWith;
-		public int carry;
-		public static final int NO_CARRY = 0;
-		public static final int CARRY_NEXT = 1;
-		public static final int CARRY_PREV = 2;
+		/** The state of whether this beat is a "carrying" beat 
+		 * To be used in future iterations of this project */
+		
+		
+		/** Constructor for the beat that instantiates basic
+		 *  values for the volume and instrument for this beat */
 		public Beat()
 		{
 			volume = Instrument.SELECTION_UNCONFIRMED;
 			this.playsWith = new Instrument("");
+			
 		}
+		
+		/** Return the first part of this beat's count */
 		public String firstPartOfCount()
 		{
 			switch(count) {
@@ -593,8 +563,11 @@ public class MusicalObjects {
 			}
 			return count.alias.toLowerCase();
 		}
+		
+		/** Return the string representation of this beat's descriptive type */
 		public abstract String type();
 		
+		/** Set the millisecond playstring from a number representing beats per minute */
 		public void setPlayspeedFromBPMString(String bpmStr) {
 			// say it's 4 what would happen? 
 			// it should turn into 250
@@ -605,55 +578,74 @@ public class MusicalObjects {
 			double ms = 1000/bps;
 			this.playSpeedMs = Math.round(ms);
 		}
+		
+		/** Set how long this beat should durate in milliseconds */
 		public void setPlaySpeedMs(long playSpeed) { this.playSpeedMs = playSpeed; }
 	}
 	
+	/** A Musical Objects Rest indicates that a break
+	 * should occur of a certain duration in the score. 
+	 */
 	public static class Rest extends Beat {
 		
-		public Rest()
-		{
-			this(Count.UNKC);
-		}
-		public Rest(Count count)
-		{
+		/** Constructor for the rest that sets the count to an unset value */
+		public Rest() { this(Count.UNKC); }
+		
+		/** Constructor for the rest that sets the count to a specific value */
+		public Rest(Count count) {
 			this.count = count;
 			pitchVal = 0;
 			midiNumber = 0;
 			volume = 0;
 		}
+		/** Constructor for the rest that sets the count to a specific value
+		 * as well as the hard duration for the rest in the same constructor
+		 */
 		public Rest(Count count, long playSpeedMs)
 		{
 			this(count);
 			this.playSpeedMs = playSpeedMs;
 		}
-//		public Rest(Count count, int carryCode)
-//		{
-//			this(count);
-//			this.carry = carryCode;
-//		}
+
+		/** Return the string representation of this beat's descriptive type.
+		 * For the Rest, returns the string "rest" */
 		public static String getType(){return "rest";}
 		
+		/** An instance member that returns the string representation of this 
+		 * beat's descriptive type. For the Rest, returns the string "rest" */ 
 		public String type() {return getType();}
+		
+		/** Return a string representation of this rest object. 
+		 *  Consists of the string "r" followed by a shortened string version 
+		 *  of the count object */
 		public String toString()
 		{
 			return "r" + (count != Count.UNKC ? "." + firstPartOfCount() : "");
 		}
 	}
 	
+	/** 
+	 * A Musical Objects note indicates that an instrument should be played. 
+	 */
 	public static class Note extends Beat {
+		/** The pitch object holding the midi number used to play the note. */
 		public Pitch pitch;
 		
-//		public Note(Count count, Pitch pitch, int carryCode)
-//		{
-//			this(count, pitch);
-//			this.carry = carryCode;
-//		}
+		/** Constructor for the note, which sets only the pitch to play and 
+		 * the count for the duration of the note. 
+		 * @param count
+		 * @param pitch
+		 */
 		public Note(Count count, Pitch pitch) {
 			this.count = count;
 			this.pitch = pitch;
 			pitchVal = pitch.noteValue;
 			midiNumber = pitch.midiNumber;
 		}
+		
+		/** Constructor for the note, which sets the count for the duration of the note,
+		 * the pitch to play, and the volume at which to play the note. 
+		 */
 		public Note(Count count, Pitch pitch, int volumeSeting)
 		{
 			this.count = count;
@@ -662,32 +654,54 @@ public class MusicalObjects {
 			pitchVal = pitch.noteValue;
 			midiNumber = pitch.midiNumber;
 		}
+		/** 
+		 * Constructor for the note, which sets the count for the duration of the note,
+		 * the pitch to play, the volume at which to play the note, and the 
+		 * length of time this note should be played for in milliseconds.
+		 */
 		public Note(Count count, Pitch pitch, int volumeSetting, long playSpeedMs)
 		{
 			this(count, pitch, volumeSetting);
 			this.playSpeedMs = playSpeedMs;
 		}
+		/** Copy constructor for the note, that copies the count, the pitch, the old
+		 * volume, and the playspeed to this new object.
+		 */
 		public Note(Note oldNote)
 		{
 			this(oldNote.count, oldNote.pitch, oldNote.volume, oldNote.playSpeedMs);
 		}
+		/** An instance member that returns the string representation of this 
+		 * beat's descriptive type. For the Note , returns the string "note" */ 
 		public String type(){return "note";}
 		
+		/** Returns a string representation of this note, the name of the pitch,
+		 * followed by the short name for the duration count of the note.
+		 */
 		public String toString()
 		{
 			return pitch.name() + "." + count.name();
 		}
+		
+		/** Return the string representation of this beat's descriptive type.
+		 * For the Note, returns the string "note" */
 		public static String getType() {return "note";}
 	}
+
 	
+	/**
+	 * A Musical Objects strike indicates an onomatopoeia or in other words, 
+	 * a "sound-sounding"-word, that should be played on the MIDI drum kit.
+	 * The Sound chosen selects the midi number that should be played.
+	 */
 	public static class Strike extends Beat {
+		
+		/** The sound object holding the midi number used to play the strike. */
 		public Sound sound;
 		
-//		public Strike(Count count, Sound sound, int carryCode)
-//		{
-//			this(count, sound);
-//		}
-		
+		/** Constructor for the strike which sets only the strike to play and
+		 * the count for the duration of the strike.
+		 */
 		public Strike(Count count, Sound sound)
 		{
 			this.isSpecialSound = true;
@@ -696,24 +710,55 @@ public class MusicalObjects {
 			pitchVal = Pitch.C4.noteValue;
 			midiNumber = sound.midiNumber;
 		}
+		/** Constructor for the strike, which sets the count duration
+		 * of the strike, the sound to play, and the volume loudness at which to 
+		 * play the strike.
+		 */
 		public Strike(Count count, Sound sound, int volumeSetting)
 		{
 			this(count, sound);
 			this.volume = volumeSetting;
 		}
+		/**
+		 * Constructor for the strike, which sets the count duration of the strike,
+		 * the sound to play, the volume at which the strike should be played, and
+		 * the speed of the score this strike is being played for, in milliseconds.
+		 */
 		public Strike(Count count, Sound sound, int volumeSetting, long playSpeedMs)
 		{
 			this(count, sound, volumeSetting);
 			this.playSpeedMs = playSpeedMs;
 		}
 		
+		/** An instance member that returns the string representation of this 
+		 *  beat's descriptive type. For the Strike, returns the string "strike" */ 
 		@Override
 		public String type() { return getType(); }
+		
+		/** Return the string representation of this beat's descriptive type.
+		 * For the Note, returns the string "strike" */
 		public static String getType(){ return "strike"; }
+		
+		/** Returns a string representation of this note, the name of this 
+		 *  pitch, in all capital letters. 
+		 */
 		public String toString() { return sound.name(); }
 	}
 	
 	
+	/**
+	 * Report on the scaled duration of the count, given the provided information about the 
+	 * score. The second count, getsTheBeat, is used to determine the standard count
+	 * of the score, for which to help determine the length of the count in question.
+	 * The getsTheBeatValue is divided or multiplied by a "scale factor" and
+	 * returned from this function. 
+	 * 
+	 * This scale factor is calculated to be greater than 1,
+	 * and the value returns from this function is set to grow, if getsTheBeat's relative
+	 * duration is greater than count's duration. The scale factor is less than one,
+	 * and the value returned is set to shrink if getTheBeat's relative duration is less
+	 * than the count's duration.
+	 */
 	public static float durationOf(Count count, Count getsTheBeat, float getsTheBeatValue)
 	{
 		if(count.ordinal() < getsTheBeat.ordinal()) {
@@ -931,191 +976,22 @@ public class MusicalObjects {
 		}
 		return getsTheBeatValue;
 	}
+	
+	/** 
+	 * Report on the scaled duration of the count, given the provided information about the 
+	 * score. The second count, getsTheBeat, is used to determine the standard count
+	 * of the score, for which to help determine the length of the count of the beat provided.
+	 * The getsTheBeatValue is divided or multiplied by a "scale factor" and
+	 * returned from this function. 
+	 * 
+	 * This scale factor is calculated to be greater than 1,
+	 * and the value returns from this function is set to grow, if getsTheBeat's relative
+	 * duration is greater than count's duration. The scale factor is less than one,
+	 * and the value returned is set to shrink if getTheBeat's relative duration is less
+	 * than the count's duration.
+	 */
 	public static float durationOf(Beat beat, Count getsTheBeat, float getsTheBeatValue)
 	{
 		return durationOf(beat.count, getsTheBeat, getsTheBeatValue);
-	}
-	
-	
-	public static class BeatSet 
-	{
-		public final Note tt, t2t, t, dt;
-		public final Note ts, t2s, s, ds;
-		public final Note te, t2e, e, de;
-		public final Note tq, t2q, q, dq;
-		public final Note th, t2h, h, dh;
-		public final Note tw, t2w, w, dw;
-		
-		
-		public BeatSet(Pitch pitch)
-		{
-			t = new Note(Count.TSND, pitch);
-				tt = new Note(Count.TRIPLET_TSND, pitch);
-				t2t = new Note(Count.DOUBLE_TRIPLET_TSND, pitch);
-				dt = new Note(Count.DOTTED_TSND, pitch);
-			s = new Note(Count.SXTH, pitch);
-				ts = new Note(Count.TRIPLET_SXTH, pitch);
-				t2s = new Note(Count.DOUBLE_TRIPLET_SXTH, pitch);
-				ds = new Note(Count.DOTTED_SXTH, pitch);
-			e = new Note(Count.EGTH, pitch);
-				te = new Note(Count.TRIPLET_EGTH, pitch);
-				t2e = new Note(Count.DOUBLE_TRIPLET_EGTH, pitch);
-				de = new Note(Count.DOTTED_EGTH, pitch);
-			q = new Note(Count.QTR, pitch);
-				tq = new Note(Count.TRIPLET_QTR, pitch);
-				t2q = new Note(Count.DOUBLE_TRIPLET_QTR, pitch);
-				dq = new Note(Count.DOTTED_QTR, pitch);
-			h = new Note(Count.HALF, pitch);
-				th = new Note(Count.TRIPLET_HALF, pitch);
-				t2h = new Note(Count.DOUBLE_TRIPLET_HALF, pitch);
-				dh = new Note(Count.DOTTED_HALF, pitch);
-			w = new Note(Count.WHOLE, pitch);
-				tw = new Note(Count.TRIPLET_WHOLE, pitch);
-				t2w = new Note(Count.DOUBLE_TRIPLET_WHOLE, pitch);
-				dw = new Note(Count.DOTTED_WHOLE, pitch);
-		}
-	}
-	
-	public static class RestSet
-	{
-		public Rest tt, t2t, t, dt;
-		public Rest ts, t2s, s, ds;
-		public Rest te, t2e, e, de;
-		public Rest tq, t2q, q, dq;
-		public Rest th, t2h, h, dh; 
-		public Rest tw, t2w, w, dw;
-		public Rest tw2, t2w2, w2, dw2;
-		public RestSet()
-		{
-			t = new Rest(Count.TSND);
-				dt = new Rest(Count.DOTTED_TSND);
-				t2t = new Rest(Count.DOUBLE_TRIPLET_TSND);
-				tt = new Rest(Count.TRIPLET_TSND);
-			s = new Rest(Count.SXTH);
-				ts = new Rest(Count.TRIPLET_SXTH);
-				t2s = new Rest(Count.DOUBLE_TRIPLET_SXTH);
-				ds = new Rest(Count.DOTTED_SXTH);
-			e = new Rest(Count.EGTH);
-				te = new Rest(Count.TRIPLET_EGTH);
-				t2e = new Rest(Count.DOUBLE_TRIPLET_EGTH);
-				de = new Rest(Count.DOTTED_EGTH);
-			q = new Rest(Count.QTR);
-				tq = new Rest(Count.TRIPLET_QTR);
-				t2q = new Rest(Count.DOUBLE_TRIPLET_QTR);
-				dq = new Rest(Count.DOTTED_QTR);
-			h = new Rest(Count.HALF);
-				th = new Rest(Count.TRIPLET_HALF);
-				t2h = new Rest(Count.DOUBLE_TRIPLET_HALF);
-				dh = new Rest(Count.DOTTED_HALF);
-			w = new Rest(Count.WHOLE);
-				tw = new Rest(Count.TRIPLET_WHOLE);
-				t2w = new Rest(Count.DOUBLE_TRIPLET_WHOLE);
-				dw = new Rest(Count.DOTTED_WHOLE);
-			w2 = new Rest(Count.DWHOLE);
-				tw2 = new Rest(Count.TRIPLET_DWHOLE);
-				t2w2 = new Rest(Count.DOUBLE_TRIPLET_DWHOLE);
-				dw2 = new Rest(Count.DOTTED_DWHOLE);
-		}
-	}
-	
-	public static class MeasureLimit { 
-		public int limitStart;
-		public MeasureLimit(int measureNumber) { 
-			this.limitStart = measureNumber;
-		}
-	}
-	public static class Measure  
-	{
-		public LinkedList<Beat> beats;
-		public Measure reference;
-		public Meter meter;
-		
-		
-		public Measure(int beatsPerMeasure, Count getsTheBeat)
-		{
-			beats = new LinkedList<Beat>();
-			meter = new Meter(beatsPerMeasure, getsTheBeat);
-		}
-		public Measure(Meter meter)
-		{
-			beats = new LinkedList<Beat>();
-			this.meter = meter;
-		}
-		public Beat first()
-		{
-			return beats.getFirst();
-		}
-		public Beat end()
-		{
-			return beats.getLast();
-		}
-		public void setMeter(Meter newMeterSpeed)
-		{
-			this.meter = newMeterSpeed;
-		}
-		public Measure addBeat(Beat toAdd)
-		{
-			beats.add(toAdd);
-			return this;
-		}
-		public Beat pop()
-		{
-			return beats.pollLast();
-		}
-		public Measure addAllBeats(Collection<Beat> toAdd)
-		{
-			beats.addAll(toAdd);
-			return this;
-		}
-		
-		public Measure addAllBeats(Beat[] toAdd)
-		{
-			beats.addAll(Arrays.asList(toAdd));
-			return this;
-		}
-		
-		public boolean isEmpty()
-		{
-			return beats.isEmpty();
-		}
-		public String toString()
-		{
-			if(beats.isEmpty())
-				return "||";
-			Iterator<Beat> beatIt = beats.iterator();
-			String measureLine = "";
-			boolean firstBeat = true;
-			do {
-				Beat next = beatIt.next();
-				if(firstBeat) {
-					if(next.carry == Note.CARRY_PREV) 
-						measureLine += "-";
-					else
-						measureLine += " ";
-				}
-				else
-					measureLine += "";
-				firstBeat = false;
-				if(next.type().equals(Rest.getType()))
-					measureLine += String.format("r.%c", Character.toLowerCase(next.count.name().charAt(0)));
-				else if(next.type().equals(Strike.getType()))
-					measureLine += ((Strike)next).sound;
-				else if(next.type().equals(Note.getType())) {
-					char firstCharCount = Character.toLowerCase(next.count.name().charAt(0));
-					String noteName = ((Note)next).pitch.toString();
-					measureLine += String.format("%s.%c", noteName, firstCharCount);
-				}
-				else
-					measureLine += next;
-				if(next.carry == Note.CARRY_NEXT)
-					measureLine += "-";
-				else	
-					measureLine += " ";
-				
-			} while(beatIt.hasNext());
-			
-				
-			return "|" + measureLine + "|";
-		}
 	}
 }
