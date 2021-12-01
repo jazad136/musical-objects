@@ -22,36 +22,110 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.sound.midi.MidiChannel;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.Synthesizer;
-
-import music.TimingPair;
 import music.objects.IllegalMarking;
-import music.objects.MusicalObjects.Beat;
-import music.objects.MusicalObjects.Measure;
-import music.objects.Token;
 import music.objects.TokenLine;
 
-
 /**
- * This class is responsible for parsing input strings into music producing token lines,
+ * The LinerMeasurer class is responsible for parsing input strings into music producing token lines,
  * and for breaking up those token lines into metered measures. 
  * 
- * one first calls liner measurer's constructor to create the song from a file.
- * @author Jonathan A. Saddler
- *
+ * To create a song from a file, use liner measurer's constructor to build a TokenLine array
+ * where each token line represents tracks of the song to be played. 
+ * @author Jonathan A. Saddler, Ph. D. 
  */
 public class LinerMeasurer {
 	
-	public static List<String> weedComments(List<String> allLines)
-	{
+	
+	public TokenLine[] song;
+	boolean[] commentedSongLines;
+	static int extraLines;
+	
+	/**
+	 * Instantiate a new LinerMeasurer object. The song file passed in is
+	 * translated into a list of Strings, each string containing one line of the
+	 * input file songFile. Comments are weeded out, the initial song is built, and the
+	 * rest of the song is appended to lines of the initial song. 
+	 * Upon reaching each line, each String is broken into tokens using NoteTokenizer, 
+	 * and tokens are attached to one cell of a TokenLine array depending 
+	 * on the line of its stanza. The outcome is a song array containing tokenlines that
+	 * can be encoded into a playable song. 
+	 */
+	public LinerMeasurer(File songFile) throws IOException {
+		extraLines = 0;
+		List<String> remaining = Files.readAllLines(songFile.toPath());
+//		song = initialSong(remaining);
+		remaining = new ArrayList<String>(weedComments(remaining));
+		int firstBreak = getNextBreak(remaining, 0, true);
+		song = new TokenLine[firstBreak];
+		remaining = initialSong(remaining, song);
+		parseAndJoinLines(remaining, song);	
+	}
+	
+	/**
+	 * Get the lines that constitute the first stanza of the song, the first
+	 * lines found in the input, up until the first line break. 
+	 * <br>
+	 * Known problem: if comments appear on the last line or between the first
+	 * and last line, this method fails to recognize the number of lines in the song
+	 * properly. 
+	 */
+	public List<String> initialSong(List<String> gottenLines, TokenLine[] song) {
+		int firstBreak = getNextBreak(gottenLines, 0, true);
+		
+
+		for(int i = 0, j = 0; i < firstBreak; i++) {
+			String line = gottenLines.get(i);
+			song[j] = NoteTokenizer.allTokensFromLine(line, i+1, 1);
+			j++;
+		}
+		
+		return gottenLines.subList(firstBreak, gottenLines.size());
+	}
+	
+	public TokenLine[] initialSong(List<String> gottenLines) {
+		int firstBreak = getNextBreak(gottenLines, 0, true);	
+		ArrayList<TokenLine> song = new ArrayList<>();
+		for(int i = 0, j = 0; i < firstBreak; i++) {
+			String line = gottenLines.get(i);
+			if(line.trim().isEmpty() || isCommentLine(line))
+				continue;
+			song.add(NoteTokenizer.allTokensFromLine(line, i+1, 1));
+			gottenLines.remove(i);
+			j++;
+		}
+		return song.toArray(new TokenLine[0]);
+	}
+	
+	/**
+	 * Returns the index of the first empty line found in the list found between 0 and list.size() exclusive, 
+	 * or list.size() if there was no line break found in the list.
+	 * Line breaks consist of an empty or whitespace-only string. 
+	 */
+	private static int getNextBreak(List<String> strings) {
+		if(strings.isEmpty())
+			return -1;
+		
+		for(int i = 0; i < strings.size(); i++) {
+			String next = strings.get(i);
+			if(next.trim().isEmpty()) 
+				return i;
+		}
+//		for(int i = 0; i < strings.size(); i++) 
+//			if(strings.get(i).isBlank()) 
+//				return i;
+		
+		return strings.size();
+	}
+	
+	/** Remove any line that matches the criteria for being a comment
+	 * from the input list of strings, and return the lines remaining
+	 * after comments are removed.
+	 */
+	private static List<String> weedComments(List<String> allLines) {
 		LinkedList<String> copiedLines = new LinkedList<String>();
 		Iterator<String> lines = allLines.iterator();
 		while(lines.hasNext()) {
@@ -62,133 +136,19 @@ public class LinerMeasurer {
 		return copiedLines;
 	}
 	
-	
-	 
-	
-	public static List<String> weedInitialComments(List<String> allLines)
-	{
-		LinkedList<String> copiedLines = new LinkedList<String>();
-		Iterator<String> lines = allLines.iterator();
-		while(lines.hasNext()) {
-			String next = lines.next().trim();
-			if(isCommentLine(next)) 
-				lines.remove();
-			break;
-		}
-//		while(lines.hasNext()) {
-//			copiedLines.add(lines.next().trim());
-//		}
-		return copiedLines;
-	}
-	
-	public static boolean isCommentLine(String line)
-	{
-		return line.startsWith("//");
-	}
-	
-	public TokenLine[] song;
-	boolean[] commentedSongLines;
-	static int extraLines;
-	
-	public LinerMeasurer(File songFile) throws IOException
-	{
-		extraLines = 0;
-		
-		List<String> remaining = Files.readAllLines(songFile.toPath());
-//		remaining = new ArrayList<String>(weedInitialComments(remaining));
-		
-		remaining = new ArrayList<String>(weedComments(remaining));
-		int firstBreak = getNextBreak(remaining);
-		song = new TokenLine[firstBreak];
-		remaining = initialSong(remaining, song);
-		parseAndJoinLines(remaining, song);	
-	}
-	public static class New
-	{
-		public static TokenLine[] parseNewFile(File songFile) throws IOException
-		{
-			List<String> remaining = Files.readAllLines(songFile.toPath());
-			return createLines(remaining);
-		}
-		/**
-		 * Returns 
-		 * A) the index of the first empty line found in the list found between 0 and list.size() exclusive, 
-		 * or list.size() if there was no line break found in the list.<br>
-		 * B) the number of comment lines found in the lines found. 
-		 * @param strings
-		 * @return
-		 */
-		public static int[] getInitialNextBreak(List<String> strings)
-		{
-			int i, uselessLines;
-			boolean breakOnNextEmpty = false;
-			for(i = 0, uselessLines = 0; i < strings.size(); i++) {
-				String next = strings.get(i).trim();
-				if(next.isEmpty())
-					if(breakOnNextEmpty) 
-						break;
-					else
-						uselessLines++;
-				else {
-					if(isCommentLine(next))
-						uselessLines++;
-					breakOnNextEmpty = true;
-				}
-			}
-			return new int[]{i, uselessLines};
-		}
-		
-		public static TokenLine[] createLines(String... input)
-		{
-			return createLines(Arrays.asList(input));
-		}
-		public static TokenLine[] createLines(List<String> input)
-		{
-			// first line. 
-			int[] breaks = getInitialNextBreak(input);
-			int stanzaBreak = breaks[0];
-			int nothingLines = breaks[1];
-			// the song has the number of lines
-			// equal to the number of lines before the first break minus the lines that don't get parsed.
-			int songLines = stanzaBreak - nothingLines;
-			TokenLine[] song = new TokenLine[songLines];
-			int assignStanza;
-			
-			// loop through each stanza
-			int totalLine = 1;
-			for(assignStanza = 1; !input.isEmpty(); assignStanza++) {
-				// loop through each line in the stanza
-				for(int line = 0, assignLine = 0; line < stanzaBreak; line++, totalLine++) {
-					String nextL = input.get(line).trim();
-					if(!nextL.isEmpty() && !isCommentLine(nextL)) {
-						// if it's not a comment or empty line, parse it as music
-						if(assignLine > songLines) 
-							// if we have gone over the  max amount of lines in the stanza throw an exception
-							throw new IllegalMarking(assignLine + " lines specified in stanza " + assignStanza + " at line " + totalLine + ".\n"
-									+ "This song can only have " + songLines + " lines per stanza.");
-						// assign the line
-						song[assignLine++] = NoteTokenizer.allTokensFromLine(nextL, totalLine, assignStanza);
-					}
-				}
-				// get the next stanza
-				input = input.subList(stanzaBreak, input.size());
-				int s = getNextStanza(input);
-				if(s == -1)
-					break;
-				input = input.subList(s, input.size());
-				totalLine += s;
-				stanzaBreak = getNextBreak(input);
-			}
-			return song;
-		}
-	}
+	/** Return true if line starts with '//' and false otherwise */
+	private static boolean isCommentLine(String line) { return line.startsWith("//"); }
 	
 	
 	/**
-	 * If there are lines remaining after the initial stanza, join those lines to the ends
-	 * of the initial stanza.
-	 * @param remainingLines
-	 * @param finalLines
+	 * For each string in remaining lines, find the line in finalLines 
+	 * it pertains to, and then join the elements of new lines to the end of it. 
+	 * The end goal of this method is to join together the full track remaining in the song 
+	 * in lines below the first segment of a track that appears in a song atop the file.
+	 * 
+	 *  If there are too many lines in a stanza in the input, this will
+	 *  be reported as an error. (this method has a known bug, pertaining to the line
+	 *  of this error not being as accurate as it could be.) 
 	 */
 	public void parseAndJoinLines(List<String> remainingLines, TokenLine[] finalLines)
 	{	
@@ -223,63 +183,19 @@ public class LinerMeasurer {
 		}
 	}
 	
-	/**
-	 * Get the list of lines that represents the first line of the song.
-	 * If any of these lines are commented
-	 * @param gottenLines
-	 * @param song
-	 * @return
-	 */
-	public List<String> initialSong(List<String> gottenLines, TokenLine[] song)
-	{
-		
-		int firstBreak = getNextBreak(gottenLines);
-		commentedSongLines = new boolean[firstBreak];
-		for(int i = 0; i < firstBreak; i++) {
-			String line = gottenLines.get(i);
-			song[i] = NoteTokenizer.allTokensFromLine(line, i+1, 1);
-			if(isCommentLine(line)) 
-				commentedSongLines[i] = true;
-		}
-		
-		return gottenLines.subList(firstBreak, gottenLines.size());
-	}
-	/**
-	 * Returns the index of the first empty line found in the list found between 0 and list.size() exclusive, 
-	 * or list.size() if there was no line break found in the list.
-	 */
-	public static int getNextBreak(List<String> strings)
-	{
-		if(strings.isEmpty())
-			return -1;
-		
-		for(int i = 0; i < strings.size(); i++) {
-			String next = strings.get(i);
-			if(next.trim().isEmpty()) 
-				return i;
-		}
-		return strings.size();
-	}
-	public static int getNextStanza(List<String> strings)
-	{
-		if(strings.isEmpty())
-			return -1;
-		
-		for(int i = 0; i < strings.size(); i++) {
-			String next = strings.get(i);
-			if(!next.trim().isEmpty() && isCommentLine(next))
-				return i;
-		}
-		return -1;
-	}
+	
+	
 	
 	/**
 	 * Returns the index of the first empty line found in the list found between 0 and list.size() exclusive, 
-	 * or list.size() if there was no line break found in the list between the indices of startAt and list.size().  
-	 * If nonTrivial is specified, then the first set of empty lines in the list are not considered. 
+	 * or list.size() if there was no line break found in the list between the indices of startAt 
+	 * and list.size().  
+	 * 
+	 * If nonTrivial is specified, then the first set of empty or comment lines in the input are not
+	 * considered, and a break will be searched for after the first non-comment non-empty line 
+	 * is found in the input. 
 	 */
-	public static int getNextBreak(List<String> strings, int startAt, boolean nonTrivial)
-	{
+	private static int getNextBreak(List<String> strings, int startAt, boolean nonTrivial) {
 		if(startAt >= strings.size())
 			return strings.size();
 		else if(startAt < 0)
@@ -296,22 +212,7 @@ public class LinerMeasurer {
 			}
 			else
 				breakOnNext = true;
-		}
-		
+		}		
 		return i;
-	}
-	
-	public static List<TimingPair> generateTonesMidi(Beat[] notes, Synthesizer synth, int volume, boolean addHarmonic) 
-			throws MidiUnavailableException
-	{
-	    MidiChannel[] channels = synth.getChannels();
-	    MidiChannel pianoChannel = channels[0];
-	    List<TimingPair> tp = new ArrayList<TimingPair>();
-		for(int i = 0; i < notes.length; i++) {
-			Beat nextB = notes[i];
-			TimingPair t = new TimingPair(nextB, pianoChannel, volume);
-			tp.add(t);
-		}
-		return tp;
 	}
 }
