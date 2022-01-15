@@ -29,7 +29,6 @@ import javax.sound.midi.Synthesizer;
 
 import music.objects.MusicalObjects;
 import music.objects.MusicalObjects.Beat;
-import music.objects.MusicalObjects.Rest;
 
 /**
  * This class keeps a representation of a recorded list of notes. 
