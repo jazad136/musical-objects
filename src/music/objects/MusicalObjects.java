@@ -753,11 +753,9 @@ public class MusicalObjects {
 	 * The getsTheBeatValue is divided or multiplied by a "scale factor" and
 	 * returned from this function. 
 	 * 
-	 * This scale factor is calculated to be greater than 1,
-	 * and the value returns from this function is set to grow, if getsTheBeat's relative
-	 * duration is greater than count's duration. The scale factor is less than one,
-	 * and the value returned is set to shrink if getTheBeat's relative duration is less
-	 * than the count's duration.
+	 * If getsTheBeat's relative duration is greater than count's duration, the returned float
+	 * will be greater than getsTheBeatValue. The returned float will be less than that of
+	 * getsTheBeatValue if getTheBeat's relative duration is lower than the count's duration.
 	 */
 	public static float durationOf(Count count, Count getsTheBeat, float getsTheBeatValue)
 	{
