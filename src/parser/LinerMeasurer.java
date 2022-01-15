@@ -57,13 +57,18 @@ public class LinerMeasurer {
 	public LinerMeasurer(File songFile) throws IOException {
 		extraLines = 0;
 		List<String> remaining = Files.readAllLines(songFile.toPath());
-//		song = initialSong(remaining);
 		remaining = new ArrayList<String>(weedComments(remaining));
 		int firstBreak = getNextBreak(remaining, 0, true);
 		song = new TokenLine[firstBreak];
 		remaining = initialSong(remaining, song);
 		parseAndJoinLines(remaining, song);	
 	}
+//	public LinerMeasurer(File songFile) throws IOException {
+//		extraLines = 0;
+//		List<String> remaining = Files.readAllLines(songFile.toPath());
+//		song = initialSong(remaining);
+//		parseAndJoinLines(remaining, song);	
+//	}
 	
 	/**
 	 * Get the lines that constitute the first stanza of the song, the first
@@ -89,12 +94,12 @@ public class LinerMeasurer {
 	public TokenLine[] initialSong(List<String> gottenLines) {
 		int firstBreak = getNextBreak(gottenLines, 0, true);	
 		ArrayList<TokenLine> song = new ArrayList<>();
-		for(int i = 0, j = 0; i < firstBreak; i++) {
+		for(int i = 0, j = 1; i < firstBreak; i++) {
 			String line = gottenLines.get(i);
-			if(line.trim().isEmpty() || isCommentLine(line))
+			if(line.trim().isEmpty() || isCommentLine(line)) {
 				continue;
-			song.add(NoteTokenizer.allTokensFromLine(line, i+1, 1));
-			gottenLines.remove(i);
+			}
+			song.add(NoteTokenizer.allTokensFromLine(line, j, 1));
 			j++;
 		}
 		return song.toArray(new TokenLine[0]);
